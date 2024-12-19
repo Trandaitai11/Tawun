@@ -1,0 +1,69 @@
+-- Script Name: Tài Đẹp Trai
+-- Universal Auto-Farm Script with GUI for Blox Fruits
+
+repeat wait() until game:IsLoaded()
+
+local player = game.Players.LocalPlayer
+local workspace = game:GetService("Workspace")
+local starterGui = game:GetService("StarterGui")
+
+-- Create GUI
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "TaiDepTraiGUI"
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0.3, 0, 0.1, 0)
+frame.Position = UDim2.new(0.35, 0, 0.05, 0)
+frame.BackgroundColor3 = Color3.fromRGB(0, 128, 255)
+frame.Parent = screenGui
+
+local label = Instance.new("TextLabel")
+label.Text = "Tài Đẹp Trai"
+label.Font = Enum.Font.SourceSansBold
+label.TextSize = 30
+label.TextColor3 = Color3.fromRGB(255, 255, 255)
+label.Size = UDim2.new(1, 0, 1, 0)
+label.Parent = frame
+
+-- Function to Equip Weapon
+local function equipWeapon(weaponName)
+    for _, tool in pairs(player.Backpack:GetChildren()) do
+        if tool.Name == weaponName then
+            player.Character.Humanoid:EquipTool(tool)
+            break
+        end
+    end
+end
+
+-- Auto-Farm Function
+local function autoFarm()
+    for _, enemy in pairs(workspace.Enemies:GetChildren()) do
+        if enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 then
+            repeat
+                wait()
+                player.Character.HumanoidRootPart.CFrame = enemy.HumanoidRootPart.CFrame * CFrame.new(0, 0, 5)
+                equipWeapon("Katana") -- Replace with your weapon's name
+                player.Character:FindFirstChildOfClass("Tool"):Activate()
+            until enemy.Humanoid.Health <= 0 or not enemy.Parent
+        end
+    end
+end
+
+-- Teleport Function
+local function teleportTo(location)
+    player.Character.HumanoidRootPart.CFrame = CFrame.new(location)
+end
+
+-- Example Teleport Locations
+local islands = {
+    ["Starter Island"] = Vector3.new(1000, 10, 500),
+    ["Jungle"] = Vector3.new(2000, 10, 1000),
+    ["Desert"] = Vector3.new(3000, 10, 1500),
+}
+
+-- Main Loop
+while true do
+    wait(1)
+    autoFarm()
+end
