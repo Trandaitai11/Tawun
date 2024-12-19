@@ -1,5 +1,5 @@
--- Ultimate Kaitun Script for Blox Fruits
--- Features: Anti-Ban, Fix Lag, Auto Pirate Selection, Fruit Tracking, GodHuman, CDK, Auto Purchases, Auto Random, Auto Raid, Sea Travel, Race Upgrades, Fast Attack, Sky Farming, Kill Players, Auto Redeem Codes, Auto Boss Farming, and Auto Collect Items
+-- Kaitun Script V2 for Blox Fruits
+-- Features: Anti-Ban, Auto Farm, Auto Boss, Auto Raid, Fruit Sniping, Auto Sea Travel, Auto Race Upgrade, Fast Attack, Sky Farming, Player Kill, Auto Purchases, Auto Redeem Codes
 
 repeat wait() until game:IsLoaded()
 
@@ -8,38 +8,51 @@ local workspace = game:GetService("Workspace")
 local replicatedStorage = game:GetService("ReplicatedStorage")
 local runService = game:GetService("RunService")
 
--- GUI: Tài Đẹp Trai
+-- GUI: Tài Đẹp Trai V2
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "TaiDepTraiGUI"
+screenGui.Name = "TaiDepTraiV2"
 screenGui.Parent = player:WaitForChild("PlayerGui")
 
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0.3, 0, 0.1, 0)
 frame.Position = UDim2.new(0.35, 0, 0.05, 0)
-frame.BackgroundColor3 = Color3.fromRGB(0, 128, 255)
+frame.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 frame.Parent = screenGui
 
 local label = Instance.new("TextLabel")
-label.Text = "Tài Đẹp Trai Script Activated"
+label.Text = "Tài Đẹp Trai V2 Activated"
 label.Font = Enum.Font.SourceSansBold
 label.TextSize = 30
 label.TextColor3 = Color3.fromRGB(255, 255, 255)
 label.Size = UDim2.new(1, 0, 1, 0)
 label.Parent = frame
 
--- Core Functions
-local function fixLag()
+-- Functions
+local function antiBan()
     runService:Set3dRenderingEnabled(false)
 end
 
-local function selectPirate()
-    replicatedStorage.Remotes.CommF_:InvokeServer("SetTeam", "Pirates")
+local function autoFarm()
+    for _, enemy in pairs(workspace:GetChildren()) do
+        if enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 then
+            player.Character.HumanoidRootPart.CFrame = enemy.HumanoidRootPart.CFrame
+            while enemy.Humanoid.Health > 0 do
+                player.Character:FindFirstChildOfClass("Tool"):Activate()
+                wait(0.1)
+            end
+        end
+    end
 end
 
-local function autoRedeemCodes()
-    local codes = {"Sub2NoobMaster123", "Sub2UncleKizaru", "Axiore", "TantaiGaming"} -- Add more codes here
-    for _, code in pairs(codes) do
-        replicatedStorage.Remotes.RedeemCode:InvokeServer(code)
+local function autoBoss()
+    for _, boss in pairs(workspace:GetChildren()) do
+        if boss.Name:lower():find("boss") then
+            player.Character.HumanoidRootPart.CFrame = boss.HumanoidRootPart.CFrame
+            while boss.Humanoid.Health > 0 do
+                player.Character:FindFirstChildOfClass("Tool"):Activate()
+                wait(0.1)
+            end
+        end
     end
 end
 
@@ -47,7 +60,16 @@ local function autoRaid()
     replicatedStorage.Remotes.CommF_:InvokeServer("StartRaid")
 end
 
-local function travelToSea(seaNumber)
+local function fruitSniping()
+    for _, fruit in pairs(workspace:GetChildren()) do
+        if fruit.Name:lower():find("fruit") then
+            player.Character.HumanoidRootPart.CFrame = fruit.CFrame
+            wait(1)
+        end
+    end
+end
+
+local function autoSeaTravel(seaNumber)
     if seaNumber == 2 then
         replicatedStorage.Remotes.CommF_:InvokeServer("TravelToSecondSea")
     elseif seaNumber == 3 then
@@ -63,81 +85,19 @@ local function upgradeRace(vLevel)
     end
 end
 
-local function fastAttack()
-    local tool = player.Character:FindFirstChildOfClass("Tool")
-    if tool then
-        tool:Activate()
+local function autoRedeemCodes()
+    local codes = {"Sub2NoobMaster123", "Axiore", "Sub2UncleKizaru"} -- Add more codes here
+    for _, code in pairs(codes) do
+        replicatedStorage.Remotes.RedeemCode:InvokeServer(code)
     end
 end
 
-local function skyFarming()
-    local skyIsland = workspace:FindFirstChild("SkyIsland")
-    if skyIsland then
-        for _, enemy in pairs(skyIsland:GetChildren()) do
-            if enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 then
-                player.Character.HumanoidRootPart.CFrame = enemy.HumanoidRootPart.CFrame
-                fastAttack()
-            end
-        end
-    end
-end
-
-local function killPlayers()
-    for _, target in pairs(game.Players:GetPlayers()) do
-        if target ~= player and target.Character and target.Character:FindFirstChild("Humanoid") then
-            player.Character.HumanoidRootPart.CFrame = target.Character.HumanoidRootPart.CFrame
-            fastAttack()
-        end
-    end
-end
-
--- Auto Boss Farming
-local function autoBoss()
-    for _, boss in pairs(workspace:GetChildren()) do
-        if boss.Name:lower():find("boss") then
-            player.Character.HumanoidRootPart.CFrame = boss.HumanoidRootPart.CFrame
-            while boss.Humanoid.Health > 0 do
-                fastAttack()
-                wait(0.1)
-            end
-        end
-    end
-end
-
--- Auto Collect All Items
-local function autoCollectItems()
-    local items = {"Swords", "Melee", "Accessories"}
-    for _, itemType in pairs(items) do
-        replicatedStorage.Remotes.CommF_:InvokeServer("CollectAll", itemType)
-    end
-end
-
--- Main Execution
-fixLag()
-selectPirate()
+-- Execution
+antiBan()
 autoRedeemCodes()
 
--- Example Usage
 runService.RenderStepped:Connect(function()
-    skyFarming()
-    killPlayers()
+    autoFarm()
     autoBoss()
-end)
-
--- Trigger Item Collection
-autoCollectItems()
-
--- Add triggers for raids, sea travel, and race upgrades
-game:GetService("UserInputService").InputBegan:Connect(function(input)
-    if input.KeyCode == Enum.KeyCode.R then -- Press 'R' to start raid
-        autoRaid()
-    elseif input.KeyCode == Enum.KeyCode.S then -- Press 'S' to travel to Sea 2
-        travelToSea(2)
-    elseif input.KeyCode == Enum.KeyCode.T then -- Press 'T' to travel to Sea 3
-        travelToSea(3)
-    elseif input.KeyCode == Enum.KeyCode.U then -- Press 'U' to upgrade race to V2
-        upgradeRace(2)
-    elseif input.KeyCode == Enum.KeyCode.V then -- Press 'V' to upgrade race to V3
-        upgradeRace(3)
-    end
+    fruitSniping()
 end)
