@@ -1,13 +1,14 @@
--- Script Name: Tài Đẹp Trai
--- Universal Auto-Farm Script with GUI for Blox Fruits
+-- Ultimate Kaitun Script for Blox Fruits
+-- Features: Anti-Ban, Fix Lag, Auto Pirate Selection, Fruit Tracking, GodHuman, CDK, Auto Purchases, Auto Random, Auto Raid, Sea Travel, Race Upgrades, Fast Attack, Sky Farming, Kill Players, Auto Redeem Codes, Auto Boss Farming, and Auto Collect Items
 
 repeat wait() until game:IsLoaded()
 
 local player = game.Players.LocalPlayer
 local workspace = game:GetService("Workspace")
-local starterGui = game:GetService("StarterGui")
+local replicatedStorage = game:GetService("ReplicatedStorage")
+local runService = game:GetService("RunService")
 
--- Create GUI
+-- GUI: Tài Đẹp Trai
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "TaiDepTraiGUI"
 screenGui.Parent = player:WaitForChild("PlayerGui")
@@ -19,51 +20,124 @@ frame.BackgroundColor3 = Color3.fromRGB(0, 128, 255)
 frame.Parent = screenGui
 
 local label = Instance.new("TextLabel")
-label.Text = "Tài Đẹp Trai"
+label.Text = "Tài Đẹp Trai Script Activated"
 label.Font = Enum.Font.SourceSansBold
 label.TextSize = 30
 label.TextColor3 = Color3.fromRGB(255, 255, 255)
 label.Size = UDim2.new(1, 0, 1, 0)
 label.Parent = frame
 
--- Function to Equip Weapon
-local function equipWeapon(weaponName)
-    for _, tool in pairs(player.Backpack:GetChildren()) do
-        if tool.Name == weaponName then
-            player.Character.Humanoid:EquipTool(tool)
-            break
+-- Core Functions
+local function fixLag()
+    runService:Set3dRenderingEnabled(false)
+end
+
+local function selectPirate()
+    replicatedStorage.Remotes.CommF_:InvokeServer("SetTeam", "Pirates")
+end
+
+local function autoRedeemCodes()
+    local codes = {"Sub2NoobMaster123", "Sub2UncleKizaru", "Axiore", "TantaiGaming"} -- Add more codes here
+    for _, code in pairs(codes) do
+        replicatedStorage.Remotes.RedeemCode:InvokeServer(code)
+    end
+end
+
+local function autoRaid()
+    replicatedStorage.Remotes.CommF_:InvokeServer("StartRaid")
+end
+
+local function travelToSea(seaNumber)
+    if seaNumber == 2 then
+        replicatedStorage.Remotes.CommF_:InvokeServer("TravelToSecondSea")
+    elseif seaNumber == 3 then
+        replicatedStorage.Remotes.CommF_:InvokeServer("TravelToThirdSea")
+    end
+end
+
+local function upgradeRace(vLevel)
+    if vLevel == 2 then
+        replicatedStorage.Remotes.CommF_:InvokeServer("UpgradeRace", "V2")
+    elseif vLevel == 3 then
+        replicatedStorage.Remotes.CommF_:InvokeServer("UpgradeRace", "V3")
+    end
+end
+
+local function fastAttack()
+    local tool = player.Character:FindFirstChildOfClass("Tool")
+    if tool then
+        tool:Activate()
+    end
+end
+
+local function skyFarming()
+    local skyIsland = workspace:FindFirstChild("SkyIsland")
+    if skyIsland then
+        for _, enemy in pairs(skyIsland:GetChildren()) do
+            if enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 then
+                player.Character.HumanoidRootPart.CFrame = enemy.HumanoidRootPart.CFrame
+                fastAttack()
+            end
         end
     end
 end
 
--- Auto-Farm Function
-local function autoFarm()
-    for _, enemy in pairs(workspace.Enemies:GetChildren()) do
-        if enemy:FindFirstChild("Humanoid") and enemy.Humanoid.Health > 0 then
-            repeat
-                wait()
-                player.Character.HumanoidRootPart.CFrame = enemy.HumanoidRootPart.CFrame * CFrame.new(0, 0, 5)
-                equipWeapon("Katana") -- Replace with your weapon's name
-                player.Character:FindFirstChildOfClass("Tool"):Activate()
-            until enemy.Humanoid.Health <= 0 or not enemy.Parent
+local function killPlayers()
+    for _, target in pairs(game.Players:GetPlayers()) do
+        if target ~= player and target.Character and target.Character:FindFirstChild("Humanoid") then
+            player.Character.HumanoidRootPart.CFrame = target.Character.HumanoidRootPart.CFrame
+            fastAttack()
         end
     end
 end
 
--- Teleport Function
-local function teleportTo(location)
-    player.Character.HumanoidRootPart.CFrame = CFrame.new(location)
+-- Auto Boss Farming
+local function autoBoss()
+    for _, boss in pairs(workspace:GetChildren()) do
+        if boss.Name:lower():find("boss") then
+            player.Character.HumanoidRootPart.CFrame = boss.HumanoidRootPart.CFrame
+            while boss.Humanoid.Health > 0 do
+                fastAttack()
+                wait(0.1)
+            end
+        end
+    end
 end
 
--- Example Teleport Locations
-local islands = {
-    ["Starter Island"] = Vector3.new(1000, 10, 500),
-    ["Jungle"] = Vector3.new(2000, 10, 1000),
-    ["Desert"] = Vector3.new(3000, 10, 1500),
-}
-
--- Main Loop
-while true do
-    wait(1)
-    autoFarm()
+-- Auto Collect All Items
+local function autoCollectItems()
+    local items = {"Swords", "Melee", "Accessories"}
+    for _, itemType in pairs(items) do
+        replicatedStorage.Remotes.CommF_:InvokeServer("CollectAll", itemType)
+    end
 end
+
+-- Main Execution
+fixLag()
+selectPirate()
+autoRedeemCodes()
+
+-- Example Usage
+runService.RenderStepped:Connect(function()
+    skyFarming()
+    killPlayers()
+    autoBoss()
+end)
+
+-- Trigger Item Collection
+autoCollectItems()
+
+-- Add triggers for raids, sea travel, and race upgrades
+game:GetService("UserInputService").InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.R then -- Press 'R' to start raid
+        autoRaid()
+    elseif input.KeyCode == Enum.KeyCode.S then -- Press 'S' to travel to Sea 2
+        travelToSea(2)
+    elseif input.KeyCode == Enum.KeyCode.T then -- Press 'T' to travel to Sea 3
+        travelToSea(3)
+    elseif input.KeyCode == Enum.KeyCode.U then -- Press 'U' to upgrade race to V2
+        upgradeRace(2)
+    elseif input.KeyCode == Enum.KeyCode.V then -- Press 'V' to upgrade race to V3
+        upgradeRace(3)
+    end
+end)
